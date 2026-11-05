@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Studio Slide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;700&display=swap">
+<link rel="stylesheet" href="style.css" id="appcss"></head><body>
+<div id="bar">
+ <button id="aS">＋ Slide</button><button id="cS" title="Salin slide beserta semua objek, urutan, dan latar">⧉ Duplikat</button><button id="aT">T Teks</button><button id="aW">⬆ HTML…</button><button id="aI">🖼 Gambar</button><input type="file" id="fim" accept="image/*" hidden>
+ <input type="file" id="fi" accept=".html,.htm" hidden>
+ <span>Transisi</span>
+ <select id="tr"><option value="slide">Geser</option><option value="fade">Pudar</option><option value="zoom">Zoom</option></select>
+ <button id="mu" title="Slide naik">↑</button><button id="md" title="Slide turun">↓</button><button id="dS">Hapus slide</button><button id="pvm" title="Lihat kondisi slide setelah tiap klik urutan, sambil tetap bisa menggeser objek ( [ dan ] = mundur/maju )">👁 Step Preview</button>
+ <span class="sp"></span><span id="msg"></span>
+ <button id="oP" title="Buka file hasil Simpan .html untuk diedit (mengganti presentasi saat ini)">📂 Buka presentasi</button><input type="file" id="fo" accept=".html,.htm" hidden>
+ <label title="Jika dicentang, file hasil simpan langsung membuka mode presentasi (Esc untuk mengedit)"><input type="checkbox" id="pa" checked> buka langsung presentasi</label>
+ <button id="sv">💾 Simpan .html</button><button id="pr" class="pri">▶ Presentasi</button>
+</div>
+<div id="main">
+ <div id="rail"></div>
+ <div id="wrap"><div id="st"></div><div id="fl"></div><button id="pmb" title="Slider (Ctrl+M)">🎚 Slider</button></div>
+ <div id="side"><div id="pvb" hidden><b>Step Preview</b>
+  <div class="pvr"><button id="pv0" title="Kondisi awal">⏮</button><button id="pvp" title="Mundur ( [ )">◀</button><span id="pvl">0 / 0</span><button id="pvn" title="Maju ( ] )">▶</button><button id="pv9" title="Langkah terakhir">⏭</button></div>
+  <input type="range" id="pvs" min="0" max="0" value="0" style="width:100%;margin-top:6px">
+  <p class="h" id="pvt" style="margin:4px 0 0"></p>
+  <p class="h" style="font-size:11px;margin:4px 0 0">Objek yang belum muncul tampil samar. Seret objek yang sudah muncul untuk mengatur posisi dasarnya (mis. teks B agar tidak menimpa A). Objek yang dipindah urutan (A&gt;kiri-atas) diatur lewat teks urutan.</p></div>
+  <div id="ly"></div>
+  <div id="none"><p class="h">Pilih objek di slide (Shift/Ctrl+klik atau seret kotak di area kosong untuk memilih banyak; Ctrl+A semua; panah = geser). Atau atur urutan klik di bawah. Klik dua kali teks untuk mengedit; seret file .html ke slide. Presentasi: → / ←, Esc keluar.</p>
+  <b>Latar slide</b>
+  <label>warna <input type="color" id="bgc" value="#ffffff"></label>
+  <label>ukuran <select id="bgf"><option value="cover">Penuh (cover)</option><option value="contain">Muat (contain)</option><option value="100% 100%">Rentang</option></select></label>
+  <button id="bgi">Gambar latar…</button><input type="file" id="fbg" accept="image/*" hidden>
+  <button id="bgx">Hapus gambar latar</button>
+  <button id="bgd">Ambil warna dari gambar latar</button>
+  <button id="bga">Terapkan latar ke semua slide</button>
+  <hr>
+  <b>Urutan klik slide ini</b>
+  <p class="h" id="wl" style="white-space:pre-line"></p>
+  <textarea id="seq" rows="6" style="width:100%;font:12px monospace" placeholder="A1&#10;A>kanan-atas*0.5, B1-2&#10;G1>muncul"></textarea>
+  <label>Objek yang disebut mulai tersembunyi <input type="checkbox" id="hid"></label>
+  <p class="h">Satu baris = satu klik; token dijalankan berurutan, tanda + = serentak.<br>
+  <b>A2</b> / <b>B3-5</b>: langkah widget<br>
+  <b>A&gt;kanan-atas*0.5</b>: pindah + skala (tengah, kiri, kanan, atas, bawah, kiri-atas, kanan-atas, kiri-bawah, kanan-bawah)<br>
+  <b>T1&gt;@480:100</b>: ke koordinat (pusat objek, kanvas 960×540)<br>
+  <b>G1&gt;kembali</b> / <b>muncul</b> / <b>hilang</b><br>
+  <b>A2-3&amp;B1-2</b>: kontainer serentak, langkah demi langkah (A2 bersama B1, lalu A3 bersama B2)<br>
+  <b>+</b> = jalan serentak bebas, <b>,</b> = berurutan (dengan jeda)<br>
+  Contoh: <b>A1, A&gt;kiri-atas*0.5+B1-2</b><br>Kosong = semua langkah widget berurutan.</p></div>
+  <div id="pp" hidden><p class="h" id="mc"></p>
+   <label>x <input type="number" id="px"></label>
+   <label>y <input type="number" id="py"></label>
+   <label>lebar <input type="number" id="pw"></label>
+   <label>tinggi <input type="number" id="ph"></label>
+   <div id="gt">
+    <label>ukuran <input type="number" id="fs"></label>
+    <label>warna <input type="color" id="col"></label>
+    <label>font <select id="ff"><option value="sans">Sans (Source Sans Pro)</option><option value="mono">Monospace (kode)</option></select></label>
+    <label>tebal <input type="checkbox" id="bo"></label>
+    <label>rata <select id="al"><option value="left">Kiri</option><option value="center">Tengah</option><option value="right">Kanan</option></select></label>
+   </div>
+   <div id="gw">
+    <label>Langkah <span id="sl"></span></label>
+    <input type="range" id="sr" min="0" max="0" value="0" style="width:100%">
+    <button id="rw">Ganti sumber HTML…</button><input type="file" id="frw" accept=".html,.htm" hidden>
+   </div>
+   <button id="zf">Ke depan</button><button id="zb">Ke belakang</button>
+   <button id="dI">Hapus objek</button>
+  </div>
+ </div>
+</div>
+<script id="app" src="script.js"></script>
+</body></html>

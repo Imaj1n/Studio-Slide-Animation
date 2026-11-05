@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Editor KaTeX</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="../../css/ui.css"></head>
+<body data-ar="var">
+<div id="app">
+<aside id="insp" aria-label="Properti">
+<div class="ih"><b>Properti</b><span>Atur animasi, warna, dan jenis transisi rumus.</span></div>
+<details class="card" open><summary><span>Proyek tersimpan <span class="badge" id="libn">0</span></span></summary><div class="cb">
+<div class="row"><input type="text" id="lnm" placeholder="Nama proyek" maxlength="60" autocomplete="off" aria-label="Nama proyek"></div>
+<div class="row"><button id="lsv" class="pri" title="Simpan perubahan ke proyek yang sedang dibuka">💾 Simpan</button><button id="lsa" title="Simpan sebagai proyek baru">Simpan baru</button><button id="lnw">Proyek kosong</button></div>
+<div class="row"><button id="lim" title="Buka file .html hasil Export HTML">⬆ Impor dari HTML…</button><input type="file" id="lfi" accept=".html,.htm" hidden></div>
+<p class="f" id="lmsg" role="status" aria-live="polite"></p>
+<div id="llist"></div>
+<p class="f">Disimpan di browser ini saja. Menghapus data situs akan menghilangkannya, jadi pakai Export HTML untuk cadangan. Hanya HTML yang diexport dari versi ini yang bisa diimpor dan diedit.</p>
+</div></details>
+<details class="card"><summary><span>Aset (scene)</span></summary><div class="cb">
+<p class="f" style="margin-top:0">Centang scene di daftar scene, lalu salin dan tempel (Ctrl+C / Ctrl+V) di proyek mana pun, juga di browser atau komputer teman.</p>
+<div class="row"><button id="acp" title="Salin scene yang dicentang (Ctrl+C)">⧉ Salin aset terpilih</button><button id="apt" title="Tempel aset dari clipboard atau dari kolom kode">Tempel aset</button></div>
+<div class="row"><button id="asa">Pilih semua</button><button id="asn">Kosongkan</button><span class="f" id="apk" style="margin:0">Belum ada scene dipilih</span></div>
+<textarea id="akd" rows="3" spellcheck="false" aria-label="Kode aset" placeholder="Kode aset muncul di sini setelah disalin. Untuk menempel kode dari teman, taruh di sini lalu klik Tempel aset."></textarea>
+<p class="f" id="amsg" role="status" aria-live="polite"></p>
+</div></details>
+<details class="card"><summary><span>Pustaka aset <span class="badge" id="bn">0</span></span></summary><div class="cb">
+<div class="row"><input type="text" id="bnm" placeholder="Nama aset" maxlength="60" autocomplete="off" aria-label="Nama aset"><button id="bsv" class="pri" title="Simpan scene yang dicentang (atau kode di kolom Aset) ke pustaka">+ Simpan ke pustaka</button></div>
+<p class="f" id="bmsg" role="status" aria-live="polite"></p>
+<input type="search" id="bq" placeholder="Cari aset…" aria-label="Cari aset" autocomplete="off">
+<div id="blist"></div>
+<p class="f">Tersimpan di browser ini. Pakai <b>Salin kode</b> untuk membagikan aset ke teman atau memindahkannya ke browser lain.</p>
+</div></details>
+<details class="card" open><summary>Animasi</summary><div class="cb">
+<div class="row">
+<label>Jumlah suku K <input type="range" id="K" min="1" max="100" value="60"> <b id="Kv">60</b></label>
+<label>Kecepatan <input type="range" id="sp" min="0" max="100" value="50"></label>
+<label><input type="checkbox" id="la"> Lanczos σ</label>
+<label><input type="checkbox" id="ep" checked> epicycle</label>
+</div>
+</div></details>
+<details class="card" open><summary>Warna & efek</summary><div class="cb">
+<div class="row"><label>Garis <input type="color" id="sc"></label><label>Isi <input type="color" id="fc" value="#38bdf8"></label><label>Opasitas isi <input type="range" id="fo" min="0" max="100" value="0"></label><label>Transisi warna <input type="range" id="cd" min="1" max="60" value="16"> <b id="cdv">1.6</b> dtk</label>
+<label>Blur <input type="range" id="bl" min="0" max="24" value="0"> <b id="blv">0</b> px</label>
+<label><input type="checkbox" id="st"> Coret (strikethrough)</label></div>
+</div></details>
+<details class="card" open><summary>Transisi</summary><div class="cb">
+<div class="row">
+<label>Mode <select id="md"><option value="auto">Otomatis</option><option value="alg">Transposisi aljabar</option><option value="morph">Morph Fourier</option></select></label>
+<label>Kanvas <select id="ar"><option value="2">2:1</option><option value="1.7778">16:9</option><option value="1.3333">4:3</option></select></label>
+<label>Pindah ruas <select id="mv"><option value="trans">Translasi saja</option><option value="spin">Translasi + putar</option></select></label></div>
+</div></details>
+<details class="card"><summary>Referensi sintaks</summary><div class="cb">
+<div class="f">z(θ) = Σ<sub>|k|≤K</sub> σ<sub>k</sub> c<sub>k</sub> e<sup>ikθ</sup>, σ<sub>k</sub> = sinc(k/(K+1)) &nbsp;(σ<sub>k</sub>=1 jika Lanczos mati)<br>
+Transposisi: glyph yang sama di dua scene (mis. <b>y</b> pada x=y → x−y=0) dipindah secara kaku: translasi hanya mengubah c<sub>0</sub>, rotasi mengalikan semua c<sub>k</sub> dengan e<sup>iα</sup>. Glyph baru (−, 0) tumbuh dari titik, glyph yang hilang (garis pecahan) menyusut. Kalau glyph tidak cocok (E → y) dipakai morph Fourier biasa.<br>
+Sintaks: <b>^</b> pangkat, <b>_</b> indeks, <b>{ }</b> grup, dan <b>\sum \int \pi \infty \alpha \theta \sqrt \partial \nabla \to</b> dst. Contoh: e^{iπ}+1=0<br>
+<b>Enter</b> = baris baru (atau <b>\\</b>). Di dalam blok, <b>&amp;</b> memisah kolom.<br>
+Matriks: <b>\begin{pmatrix} a &amp; b \\ c &amp; d \end{pmatrix}</b> (juga matrix, bmatrix, Bmatrix, vmatrix, Vmatrix, cases).<br>
+Rata seperti LaTeX: <b>\begin{align} x &amp;= a+b \\ y &amp;= c \end{align}</b>. Kalau ada &amp; di teks biasa, otomatis jadi align; tanpa &amp; baris-barisnya di tengah.<br>
+<b>\underbrace{a+b}_{n}</b>, <b>\overbrace{a+b}^{n}</b>, <b>\left( … \right)</b> (pembatas ikut tinggi isi), <b>\cdots \vdots \ddots \ldots \cdot</b>.<br>
+Batas operator: <b>\sum_{a=1}^{\infty}</b>, <b>\prod</b>, <b>\lim_{x\to 0}</b> menaruh batas di atas/bawah (rata tengah); <b>\int_a^b</b> menaruh batas di samping (atas di kanan-atas, bawah di kanan-bawah). Scene bisa dipindah urutannya dengan menyeret ⠿ di kirinya. Variabel biasa seperti x_i^2 dan {a+b}^2 ditumpuk rapi. <b>\text{Teks biasa}</b> (juga \mathrm, \mbox, \operatorname) memakai huruf tegak, bukan huruf matematika miring. <b>Coret</b> menambah garis strikethrough yang ikut di-morph; <b>Blur</b> mengaburkan tulisan (transisinya ikut animasi warna).</div>
+</div></details>
+</aside>
+<div id="main">
+<header id="top">
+<button id="itg" type="button" aria-expanded="true" aria-controls="insp" title="Ciutkan / buka panel properti" aria-label="Ciutkan atau buka panel properti"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg></button>
+<h1>Editor KaTeX</h1><span class="sp"></span><button id="ex">⬇ Export HTML</button><button id="sd" class="pri" title="Kirim animasi ini langsung ke Studio Slide, tanpa download">📤 Kirim ke Studio Slide</button>
+</header>
+<div id="work">
+<section id="cvp" aria-label="Kanvas scene">
+<div class="tools"><div class="pill" id="pre"></div><div class="pill" id="sn"></div></div>
+<div id="cvbox"><div id="cvw"><canvas id="c"></canvas></div></div>
+<div class="edit"><div id="tgrip" role="separator" aria-orientation="horizontal" aria-label="Atur tinggi kolom teks (tarik ke atas untuk memperbesar)" tabindex="0" title="Tarik ke atas untuk memperbesar kolom teks · klik dua kali untuk reset"></div><div class="row"><textarea id="tx" rows="4" autocomplete="off" spellcheck="false">E=mc^2</textarea></div></div>
+</section>
+<div id="gut" role="separator" aria-orientation="vertical" aria-label="Atur lebar kanvas dan preview" tabindex="0" title="Seret untuk mengatur lebar · klik dua kali untuk reset"></div>
+<section id="pvp" aria-label="Preview hasil">
+<div class="ph"><b>Preview hasil</b><label><input type="checkbox" id="pva" checked> Otomatis</label><button id="pvr" type="button" title="Muat ulang preview">⟳ Muat ulang</button></div>
+<div class="pvbox"><iframe id="pvf" title="Preview hasil animasi" sandbox="allow-scripts"></iframe></div>
+<div id="scn">
+<div class="row"><button id="ad" class="pri">+ Tambah scene</button><button id="pl">▶ Putar scene</button><label><input type="checkbox" id="lp" checked> Ulang (loop)</label></div>
+<h2>Daftar scene</h2>
+<div id="sl"></div>
+<p class="f">Seret ⠿ untuk mengubah urutan. Preview diperbarui otomatis saat scene berubah.</p>
+</div>
+</section>
+</div>
+</div>
+</div>
+<script src="../../js/bridge.js"></script>
+<script src="script.js"></script>
+<script src="../../js/studiodb.js"></script>
+<script src="library.js"></script>
+<script src="asset.js"></script>
+<script src="../../js/split.js"></script>
+</body></html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Studio Animasi</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="css/shell.css">
+</head>
+<body>
+<aside id="side" aria-label="Menu utama">
+  <div class="brand"><span class="logo" aria-hidden="true">∑</span><b>Studio Animasi</b>
+    <button id="tgl" class="tgl" type="button" aria-controls="side" aria-expanded="true" aria-label="Ciutkan sidebar" title="Ciutkan sidebar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+  </div>
+  <nav>
+    <a class="nav" href="#geometri" data-app="geometri">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5"/><rect x="11" y="11" width="9" height="9" rx="1"/></svg>
+      <span class="t">Editor Geometri<small>Bentuk, kurva, scene</small></span>
+    </a>
+    <a class="nav" href="#katex" data-app="katex">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 5H7l6 7-6 7h11"/></svg>
+      <span class="t">Editor KaTeX<small>Rumus yang bermorf</small></span>
+    </a>
+    <span class="flow" aria-hidden="true"></span>
+    <a class="nav" href="#slide" data-app="slide">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M9 20h6M12 16v4"/></svg>
+      <span class="t">Studio Slide<small>Susun jadi presentasi</small></span>
+      <span class="count" id="cnt" hidden>0</span>
+    </a>
+  </nav>
+  <div class="foot">
+    <label class="opt"><input type="checkbox" id="auto" checked> Buka Studio Slide setelah kirim</label>
+    <p>Pekerjaan hanya tersimpan selama tab ini terbuka. Gunakan “Simpan .html” di Studio Slide sebelum menutup.</p>
+  </div>
+</aside>
+
+<main id="stage">
+  <iframe class="pane" data-app="geometri" src="apps/geometri/index.html" title="Editor Geometri" allow="fullscreen; clipboard-read; clipboard-write"></iframe>
+  <iframe class="pane" data-app="katex" src="apps/katex/index.html" title="Editor KaTeX" allow="fullscreen; clipboard-read; clipboard-write"></iframe>
+  <iframe class="pane" data-app="slide" src="apps/slide/index.html" title="Studio Slide" allow="fullscreen; clipboard-read; clipboard-write"></iframe>
+</main>
+
+<div id="toast" role="status" aria-live="polite"></div>
+<script src="js/shell.js"></script>
+</body>
+</html>

@@ -1,0 +1,87 @@
+:root{--bg:#E5D7C4;--pn:#F2EADD;--fg:#4C3D19;--bd:#CFBB99;--ac:#354024;color-scheme:light;
+--sans:"Source Sans Pro","Source Sans 3",Helvetica,Arial,sans-serif;
+--mono:SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);font:13px Inter,system-ui,sans-serif}
+body{display:flex;flex-direction:column}
+#bar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;padding:8px;background:var(--pn);border-bottom:1px solid var(--bd)}
+button,select{font:inherit;padding:5px 9px;cursor:pointer;border:1px solid var(--bd);background:var(--pn);color:var(--fg);border-radius:5px}
+button.pri{background:var(--ac);color:#fff;border-color:var(--ac)}
+.sp{flex:1}
+#msg{color:#dc2626;font-size:12px}
+#main{flex:1;display:flex;min-height:0}
+#rail{width:140px;overflow:auto;padding:8px;background:var(--pn);border-right:1px solid var(--bd)}
+.th{position:relative;aspect-ratio:16/9;background:#fff;border:2px solid var(--bd);border-radius:4px;margin-bottom:8px;cursor:pointer}
+.th.cur{border-color:var(--ac)}
+.th b{position:absolute;left:3px;top:1px;font-size:10px;color:#64748b}
+.th i{position:absolute;background:#94a3b8;opacity:.6}
+.th i.w{background:#2563eb}
+#wrap{flex:1;position:relative;overflow:hidden;min-width:0}
+#st{position:absolute;left:50%;top:50%;width:960px;height:540px;background:#fff;overflow:hidden;box-shadow:0 2px 16px #0003;color:#0f172a;font-family:var(--sans)}
+#side{width:210px;padding:10px;overflow:auto;background:var(--pn);border-left:1px solid var(--bd)}
+#side label{display:flex;justify-content:space-between;align-items:center;margin:6px 0}
+#side input[type=number]{width:80px}
+#side button{width:100%;margin-top:8px}
+.h{opacity:.7;line-height:1.5}
+.sl{position:absolute;inset:0;background:#fff;visibility:hidden}
+.sl.cur,.sl.out{visibility:visible}
+.it{position:absolute;cursor:move;user-select:none;touch-action:none}
+.it.sel{outline:2px solid var(--ac)}
+.tx{width:100%;height:100%;white-space:pre-wrap;outline:none;overflow:hidden;user-select:text}
+.tx.m{font-family:var(--mono)}
+.lk{pointer-events:none}
+.mq{position:absolute;border:1px dashed var(--ac);background:#2563eb22;pointer-events:none;z-index:50}
+.multi .rz{display:none!important}
+.eh{visibility:hidden}.pres .eh{visibility:visible}
+#ly{max-height:180px;overflow:auto;border-bottom:1px solid var(--bd);margin-bottom:8px;padding-bottom:6px}
+.lr{display:flex;align-items:center;gap:4px;padding:3px 4px;border-radius:4px;cursor:pointer;font-size:12px}
+.lr.on{background:#2563eb33}
+.lr .ln{font-weight:700;min-width:24px}
+.lr .lb{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;opacity:.7}
+.lr i{font-style:normal;cursor:pointer;padding:0 2px}
+.w{position:absolute;inset:0;pointer-events:none}
+.w svg,.w canvas{width:100%;height:100%;display:block}
+.w #nav{display:none}
+.it{transition:opacity .4s}
+.bg{position:absolute;left:2px;top:2px;background:var(--ac);color:#fff;padding:1px 6px;border-radius:3px;font-size:11px;pointer-events:none}
+.pres .bg{display:none}
+.im{width:100%;height:100%;object-fit:contain;display:block;pointer-events:none}
+.pres .it{transition:opacity .4s,transform .9s ease-in-out}
+#fl{position:absolute;inset:0;pointer-events:none;z-index:20;overflow:hidden}
+.fp{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);width:max-content;max-width:min(94%,520px);pointer-events:auto;background:#fffffff2;color:#000;border:1px solid #0002;border-radius:12px;box-shadow:0 4px 20px #0003;font-size:13px}
+.fh{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:6px 10px;cursor:move;font-size:12px;opacity:.7;touch-action:none;user-select:none}
+.fx{cursor:pointer;padding:0 4px;font-size:16px}
+.fp #pm{position:static!important;transform:none!important;max-width:none!important;box-shadow:none!important;background:none!important;border:0!important;padding:0 10px 6px!important}
+#pmb{position:absolute;right:10px;bottom:10px;z-index:21;display:none;opacity:.4}
+#pmb:hover{opacity:.95}
+.rz{display:none;position:absolute;right:-6px;bottom:-6px;width:14px;height:14px;background:var(--ac);cursor:nwse-resize;border-radius:3px}
+.it.sel .rz{display:block}
+.pvh{pointer-events:none!important}
+#st.pv .it{transition:opacity .4s,transform .6s ease-in-out}
+#pvb{border-bottom:1px solid var(--bd);margin-bottom:8px;padding-bottom:8px}
+#pvb .pvr{display:flex;gap:4px;align-items:center;margin-top:6px}
+#pvb .pvr button{width:auto;margin:0;flex:none;padding:5px 8px}
+#pvl{flex:1;text-align:center;font-weight:700}
+#pvm.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.pres #bar,.pres #rail,.pres #side{display:none}
+.pres #wrap{position:fixed;inset:0;background:#000;z-index:9}
+.pres .it{outline:none!important;cursor:default}
+.pres .rz{display:none!important}
+
+/* tema baru (sama dengan editor): panel putih, kanvas titik-titik, tombol hitam */
+#bar{gap:6px;padding:10px 14px;background:var(--bg);border-bottom:0}
+button,select{min-height:30px;border-radius:8px}
+button:hover:not(:disabled){background:#cfbb9959}
+button.pri,#pvm.on{background:var(--ac);border-color:var(--ac);color:#E5D7C4}
+:is(button,select,input,textarea):focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+#rail,#side{background:var(--pn)}
+#rail{border-right:1px solid var(--bd)}#side{border-left:1px solid var(--bd)}
+#main{border-top:1px solid #CFBB99}
+#wrap{background:radial-gradient(#CFBB99 1px,transparent 1.3px) 0 0/18px 18px,var(--bg)}
+#st{border-radius:6px}
+.th{border-radius:8px}.th.cur{border-color:var(--ac)}
+.lr.on{background:#cfbb9966}.lr{border-radius:8px}
+input[type=checkbox]{appearance:none;-webkit-appearance:none;flex:none;width:28px;height:16px;margin:0;border-radius:99px;background:#CFBB99;position:relative;cursor:pointer}
+input[type=checkbox]::after{content:"";position:absolute;left:2px;top:2px;width:12px;height:12px;border-radius:50%;background:#fff;transition:transform .15s}
+input[type=checkbox]:checked{background:var(--ac)}input[type=checkbox]:checked::after{transform:translateX(12px)}
+@media (prefers-reduced-motion:reduce){input[type=checkbox]::after{transition:none}}

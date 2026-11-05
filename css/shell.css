@@ -1,0 +1,78 @@
+:root{--ink:#354024;--panel:#E5D7C4;--line:#889063;--tx:#E5D7C4;--mut:#CFBB99;--ac:#E5D7C4;--bg:#E5D7C4;--sbw:232px;color-scheme:light}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{display:grid;grid-template-columns:var(--sbw) minmax(0,1fr);font:14px/1.4 Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--tx)}
+
+#side{display:flex;flex-direction:column;gap:18px;padding:16px 10px 12px;background:#fff;color:var(--tx);border-right:1px solid var(--line);overflow:auto}
+.brand{display:flex;align-items:center;gap:10px;padding:0 8px}
+.brand b{font:600 17px/1.1 Georgia,"Iowan Old Style",serif;letter-spacing:-.01em}
+.logo{display:grid;place-items:center;width:30px;height:30px;border-radius:8px;background:var(--ink);color:#fff;font:700 18px/1 Georgia,serif}
+nav{display:flex;flex-direction:column}
+.nav{position:relative;display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:8px;color:var(--mut);text-decoration:none}
+.nav svg{flex:none;width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.nav .t{display:flex;flex-direction:column;min-width:0;font-weight:600;font-size:14px}
+.nav small{font-weight:400;font-size:12px;color:var(--mut);opacity:.85}
+.nav:hover{background:#f6f7f4;color:var(--tx)}
+.nav[aria-current=page]{background:var(--panel);color:var(--tx);box-shadow:inset 3px 0 0 var(--ac)}
+.nav:focus-visible,.opt input:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+.flow{display:block;height:20px;margin-left:22px;border-left:2px dashed var(--line)}
+.count{margin-left:auto;min-width:22px;padding:1px 7px;border-radius:99px;background:var(--ink);color:#fff;font-size:12px;font-weight:700;text-align:center}
+.foot{margin-top:auto;padding:0 8px;color:var(--mut);font-size:12px}
+.foot p{margin:8px 0 0;line-height:1.5}
+.opt{display:flex;gap:8px;align-items:flex-start;color:var(--tx);cursor:pointer}
+.opt input{margin-top:2px;accent-color:var(--ac)}
+
+#stage{position:relative;min-width:0;min-height:0}
+.pane{position:absolute;inset:0;width:100%;height:100%;border:0;visibility:hidden;background:var(--bg)}
+.pane.on{visibility:visible}
+
+#toast{position:fixed;right:16px;bottom:16px;max-width:min(420px,calc(100vw - 32px));padding:10px 14px;border-radius:8px;background:var(--ink);color:#fff;border-left:4px solid #5fe0c6;box-shadow:0 6px 24px #0005;opacity:0;transform:translateY(8px);pointer-events:none;transition:opacity .2s,transform .2s;z-index:20}
+#toast.show{opacity:1;transform:none}
+#toast[data-kind=warn]{border-left-color:#fbbf24}
+#toast[data-kind=err]{border-left-color:#f87171}
+
+/* sidebar ciut: hanya ikon (desktop) */
+.tgl{margin-left:auto;display:grid;place-items:center;flex:none;width:30px;height:30px;border:0;border-radius:8px;background:transparent;color:var(--mut);cursor:pointer}
+.tgl:hover{background:#0000000a;color:var(--tx)}
+.tgl:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+.tgl svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:transform .18s}
+body.anim{transition:grid-template-columns .18s ease}
+@media (min-width:761px){
+  body.rail{--sbw:64px}
+  body.rail .tgl svg{transform:rotate(180deg)}
+  body.rail .brand{flex-direction:column;gap:10px;padding:0}
+  body.rail .brand b,body.rail .nav .t,body.rail .foot{display:none}
+  body.rail .tgl{margin-left:0}
+  body.rail .nav{justify-content:center;padding:11px 0}
+  body.rail .count{position:absolute;top:2px;right:6px;min-width:18px;padding:0 5px;font-size:11px;margin:0}
+  body.rail .flow{margin-left:auto;margin-right:auto}
+}
+
+/* mode presentasi dari Studio Slide: sidebar disembunyikan */
+body.immersive{display:block}
+body.immersive #side{display:none}
+body.immersive #stage{position:fixed;inset:0}
+
+@media (max-width:760px){
+  body{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr)}
+  #side{flex-direction:row;align-items:center;gap:4px;padding:6px;overflow-x:auto}
+  .brand b,.nav small,.foot,.flow,.tgl{display:none}
+  .brand{padding:0 4px}
+  nav{flex-direction:row;gap:2px}
+  .nav{padding:8px 10px;gap:8px}
+  .nav[aria-current=page]{box-shadow:inset 0 -3px 0 var(--ac)}
+}
+@media (prefers-reduced-motion:reduce){#toast,body.anim,.tgl svg{transition:none}}
+
+/* palet: Kombu Green (sidebar), Moss Green (aksen), Tan, Bone, Café Noir (teks) */
+body{color:#4C3D19}
+#side{background:var(--ink);border-right:0}
+.brand b{color:#E5D7C4}
+.logo{background:#E5D7C4;color:#354024}
+.nav:hover{background:#e5d7c41f}
+.nav[aria-current=page]{background:#E5D7C4;color:#354024;box-shadow:inset 4px 0 0 #889063}
+.nav[aria-current=page] small{color:#4C3D19;opacity:1}
+.count{background:#889063;color:#1f2715}
+.nav[aria-current=page] .count{background:#354024;color:#E5D7C4}
+.tgl:hover{background:#e5d7c41f}
+#toast{background:#354024;color:#E5D7C4;border-left-color:#889063}

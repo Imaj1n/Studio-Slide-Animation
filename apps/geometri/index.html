@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Editor Geometri</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="../../css/ui.css"></head>
+<body data-ar="1.7778">
+<div id="app">
+<aside id="insp" aria-label="Properti">
+<div class="ih"><b>Properti</b><span>Atur gaya, transformasi, dan parameter objek.</span></div>
+<details class="card" open><summary><span>Proyek tersimpan <span class="badge" id="libn">0</span></span></summary><div class="cb">
+<div class="row"><input type="text" id="lnm" placeholder="Nama proyek" maxlength="60" autocomplete="off" aria-label="Nama proyek"></div>
+<div class="row"><button id="lsv" class="pri" title="Simpan perubahan ke proyek yang sedang dibuka">💾 Simpan</button><button id="lsa" title="Simpan sebagai proyek baru">Simpan baru</button><button id="lnw">Proyek kosong</button></div>
+<div class="row"><button id="lim" title="Buka file .html hasil Export HTML">⬆ Impor dari HTML…</button><input type="file" id="lfi" accept=".html,.htm" hidden></div>
+<p class="f" id="lmsg" role="status" aria-live="polite"></p>
+<div id="llist"></div>
+<p class="f">Disimpan di browser ini saja. Menghapus data situs akan menghilangkannya, jadi pakai Export HTML untuk cadangan.</p>
+</div></details>
+<details class="card" open><summary><span>Aset</span></summary><div class="cb">
+<p class="f" style="margin-top:0">Pilih objek di kanvas, salin, lalu tempel (Ctrl+V) di proyek mana pun, juga di browser atau komputer teman.</p>
+<div class="row"><button id="acp" title="Salin objek terpilih (Ctrl+C)">⧉ Salin aset terpilih</button><button id="apt" title="Tempel aset dari clipboard atau dari kolom kode">Tempel aset</button></div>
+<textarea id="akd" rows="3" spellcheck="false" aria-label="Kode aset" placeholder="Kode aset muncul di sini setelah disalin. Untuk menempel kode dari teman, taruh di sini lalu klik Tempel aset."></textarea>
+<p class="f" id="amsg" role="status" aria-live="polite"></p>
+</div></details>
+<details class="card" open><summary><span>Pustaka aset <span class="badge" id="bn">0</span></span></summary><div class="cb">
+<div class="row"><input type="text" id="bnm" placeholder="Nama aset" maxlength="60" autocomplete="off" aria-label="Nama aset"><button id="bsv" class="pri" title="Simpan objek terpilih (atau kode di kolom Aset) ke pustaka">+ Simpan ke pustaka</button></div>
+<p class="f" id="bmsg" role="status" aria-live="polite"></p>
+<input type="search" id="bq" placeholder="Cari aset…" aria-label="Cari aset" autocomplete="off">
+<div id="blist"></div>
+<p class="f">Tersimpan di browser ini. Pakai <b>Salin kode</b> untuk membagikan aset ke teman atau memindahkannya ke browser lain.</p>
+</div></details>
+<details class="card" open><summary>Gaya</summary><div class="cb">
+<div class="row"><label>Garis <input type="color" id="sc"></label><label>Gaya garis <select id="dh"><option value="0">Penuh ───</option><option value="1">Putus-putus ─ ─ ─</option><option value="2">Titik-titik · · · ·</option><option value="3">Titik-garis ─ · ─</option></select></label><label>Isi <input type="color" id="fc" value="#38bdf8"></label><label>Opasitas isi <input type="range" id="fo" min="0" max="100" value="0"></label><label><input type="checkbox" id="sg" checked> Snap grid ¼</label><label><input type="checkbox" id="co" checked> Label koordinat titik</label></div>
+</div></details>
+<details class="card" open><summary>Transformasi</summary><div class="cb">
+<p class="f empty">Pilih objek di kanvas untuk mengatur posisi, skala, putaran, dan memutar beberapa objek sekaligus.</p>
+<div class="row" id="pn" hidden><span id="fl" style="display:contents"></span><label><input type="checkbox" id="trc"> Jejak</label></div>
+<div class="row" id="gr" hidden><label>Sudut <input type="number" id="rgA" value="45" step="5" style="flex:none;min-width:0;width:70px">°</label><label>Pusat <select id="rgM"><option value="c">pusat kelompok</option><option value="o">titik asal (0, 0)</option><option value="x">titik kustom</option><option value="s">tiap objek sendiri</option></select></label><span id="rgX" hidden style="display:contents"><label>x <input type="number" id="rgx" value="0" step=".25" style="flex:none;min-width:0;width:70px"></label><label>y <input type="number" id="rgy" value="0" step=".25" style="flex:none;min-width:0;width:70px"></label></span><button id="rgL" title="Berlawanan arah jarum jam">↺ Putar</button><button id="rgR" title="Searah jarum jam">↻ Putar</button><button id="rgK">⌖ Pusat dari kanvas</button><button id="rgG" title="Kunci objek terpilih jadi satu grup: bergerak kaku (geser/putar/skala bersama) saat transisi scene">🔒 Kunci bersama</button><button id="rgF" title="Lepas kunci grup">🔓 Lepas kunci</button><span class="f" id="rgT"></span><label>Skala <input type="number" id="rgS" value="1.25" step=".05" min=".05" style="flex:none;min-width:0;width:64px">×</label><button id="rgU" title="Perbesar terhadap pusat yang dipilih">⤢ Perbesar</button><button id="rgD" title="Perkecil terhadap pusat yang dipilih">⤡ Perkecil</button><span class="f">Pilih beberapa objek (bentuk, vektor, kurva, teks) lalu geser, skala, atau putar bersama. Di kanvas: seret isi kotak pilihan = geser; kotak kecil = skala (Alt = dari pusat, Shift = proporsional); titik bulat di atas = putar (Shift = kelipatan 15°). Tanda panah = geser halus (Shift = 1 satuan).</span></div>
+</div></details>
+<details class="card"><summary>Sumbu & grid</summary><div class="cb">
+<div class="row"><label><input type="checkbox" id="agd" checked> Grid</label><label><input type="checkbox" id="axa" checked> Sumbu</label><span style="opacity:.6;font:.8rem system-ui,sans-serif">ikut di HTML:</span><label><input type="checkbox" id="xgd" checked> Grid</label><label><input type="checkbox" id="xax"> Sumbu</label><label><input type="checkbox" id="an" checked> Angka</label><label>x <input type="number" id="ax1" step="1"> s/d <input type="number" id="ax2" step="1"></label><label>y <input type="number" id="ay1" step=".5"> s/d <input type="number" id="ay2" step=".5"></label><label>Langkah <input type="number" id="ast" step=".5" min=".1"></label></div>
+</div></details>
+<details class="card"><summary>Parameter</summary><div class="cb">
+<div class="row" id="pr"><input type="text" id="pnm" placeholder="nama: θ, a, k…" style="flex:none;min-width:0;width:110px" spellcheck="false"><button id="pa">+ Parameter</button><button id="pd">Contoh: lingkaran satuan</button><button id="prs">Hapus jejak</button></div>
+<div id="pl2"></div>
+<div class="f">Rumus boleh dipakai di kolom x, y, putar (rad), skala (panel Transformasi), batas kurva persamaan, dan teks {…}. Contoh: <code>cos(θ)</code>, <code>1.5+θ</code>. Kolom berisi rumus mengalahkan drag; ketik angka untuk melepasnya.</div>
+</div></details>
+<details class="card"><summary>Kurva persamaan &amp; teks</summary><div class="cb">
+<div class="row" id="eq"><label>Jenis <select id="qm"><option value="y">y = f(x)</option><option value="p">x(t), y(t)</option><option value="r">r = f(θ)</option><option value="t">tabel (x, y)</option></select></label><input type="text" id="qa" value="sin(x)" placeholder="f(x)" spellcheck="false"><input type="text" id="qb" placeholder="y(t)" spellcheck="false" hidden><textarea id="qt" rows="4" hidden spellcheck="false">0, 0
+1, 1.5
+2, 1
+3, 3
+4, 2.5</textarea><label hidden><input type="checkbox" id="qs" checked> halus</label><label hidden><input type="checkbox" id="qd" checked> titik data</label><label>dari <input type="text" id="ql" value="-8" style="flex:none;min-width:0;width:72px"></label><label>sampai <input type="text" id="qh" value="8" style="flex:none;min-width:0;width:72px"></label><select id="qp"><option value="">Contoh…</option></select><button id="qg">Gambar baru</button><button id="qu">Perbarui terpilih</button></div>
+<div id="nl"></div>
+</div></details>
+<details class="card"><summary>Pintasan keyboard</summary><div class="cb">
+<div class="f" style="margin:0">Pintasan: V/C/R/L/P ganti alat · Ctrl+C / V / D salin, tempel, duplikat · Del hapus · Ctrl+Z urungkan · Seret area kosong = pilih banyak (→ terkurung, ← tersentuh) · Shift = tambah/hapus pilihan · Ctrl+A semua · Roda = zoom kamera · klik tengah + seret = geser · G kotak koordinat (kurva baru masuk ke kotak yang dipilih) · F coret bebas · Shift saat memutar = kelipatan 15° · Alt saat tarik handle kurva = handle tak simetris.</div>
+</div></details>
+</aside>
+<div id="main">
+<header id="top">
+<button id="itg" type="button" aria-expanded="true" aria-controls="insp" title="Ciutkan / buka panel properti" aria-label="Ciutkan atau buka panel properti"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg></button>
+<h1>Editor Geometri</h1><span class="sp"></span><button id="ex">⬇ Export HTML</button><button id="sd" class="pri" title="Kirim animasi ini langsung ke Studio Slide, tanpa download">📤 Kirim ke Studio Slide</button>
+</header>
+<div id="work">
+<section id="cvp" aria-label="Kanvas scene">
+<div class="tools"><div class="pill" id="tb"></div><input type="file" id="imf" accept="image/*,.svg" hidden><div class="pill" id="ac"></div><div class="pill"><button id="cr">⌖ Reset kamera</button><button id="cf">⌕ Fokus ke objek</button></div></div>
+<div class="row qkc" id="qk" hidden><canvas id="mc" width="256" height="144" style="width:256px;height:144px;flex:none;border:1px solid var(--bd);border-radius:8px;cursor:crosshair;touch-action:none"></canvas><div style="display:flex;flex-direction:column;gap:6px;flex:1;min-width:250px"><div id="mp" style="display:flex;flex-wrap:wrap;gap:4px"></div><div class="row" style="margin:0"><label><span id="mfl">y =</span> <input type="text" id="mf" value="sin(x)" spellcheck="false" style="flex:none;min-width:0;width:170px"></label><label>dari <input type="text" id="mlo" value="-2*pi" style="flex:none;min-width:0;width:64px"></label><label>sampai <input type="text" id="mhi" value="2*pi" style="flex:none;min-width:0;width:64px"></label></div><div class="row" style="margin:0"><button id="mad">+ Tambah ke kanvas</button><button id="mcl">Hapus coretan</button><span class="f">Pilih kurva, ketik rumus, atau gambar langsung di kotak kecil (seret).</span></div></div></div>
+<div id="cvbox"><div id="cvw"><canvas id="c"></canvas></div></div>
+<div class="stat" id="st"></div>
+<div id="cm" hidden></div>
+<div id="nav"><button id="nvp" aria-label="Sebelumnya">‹</button><button id="nvn" aria-label="Berikutnya">›</button></div>
+</section>
+<div id="gut" role="separator" aria-orientation="vertical" aria-label="Atur lebar kanvas dan preview" tabindex="0" title="Seret untuk mengatur lebar · klik dua kali untuk reset"></div>
+<section id="pvp" aria-label="Preview hasil">
+<div class="ph"><b>Preview hasil</b><label><input type="checkbox" id="pva" checked> Otomatis</label><button id="pvr" type="button" title="Muat ulang preview">⟳ Muat ulang</button></div>
+<div class="pvbox"><iframe id="pvf" title="Preview hasil animasi" sandbox="allow-scripts"></iframe></div>
+<div id="scn">
+<div class="row"><button id="ad" class="pri">+ Tambah scene</button><button id="pl">▶ Putar scene</button><button id="exs">★ Contoh tutorial</button></div>
+<div class="row"><label><input type="checkbox" id="lp" checked> Ulang</label><label>Durasi <input type="range" id="cd" min="5" max="40" value="16"></label><label>Suku K <input type="range" id="K" min="5" max="64" value="50"></label></div>
+<h2>Daftar scene</h2>
+<div id="sl"></div>
+<p class="f">Preview menampilkan scene yang sudah disimpan. Setelah mengubah kanvas, klik <b>Perbarui</b> pada scene terkait.</p>
+</div>
+</section>
+</div>
+</div>
+</div>
+<script src="../../js/bridge.js"></script>
+<script src="script.js"></script>
+<script src="../../js/studiodb.js"></script>
+<script src="library.js"></script>
+<script src="asset.js"></script>
+<script src="assetlib.js"></script>
+<script src="../../js/split.js"></script>
+</body></html>
