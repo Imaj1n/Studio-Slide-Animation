@@ -29,4 +29,3 @@ Preview memakai HTML export yang sama dengan "Kirim ke Studio Slide", jadi yang 
 - **Aset**: Geometri = objek terpilih di kanvas; KaTeX = scene yang dicentang. Salin dengan Ctrl+C, tempel dengan Ctrl+V di proyek mana pun (kodenya berupa teks, bisa dikirim ke teman).
 - **Pustaka aset**: aset bernama yang disimpan di browser; Tempel / Salin kode / Ganti nama / Hapus.
 - Berkas: `apps/geometri/{library,asset,assetlib}.js`, `apps/katex/{library,asset}.js`.
-# Studio-Slide-Animation
