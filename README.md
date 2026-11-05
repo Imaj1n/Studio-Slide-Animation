@@ -30,5 +30,8 @@ Preview memakai HTML export yang sama dengan "Kirim ke Studio Slide", jadi yang 
 - **Pustaka aset**: aset bernama yang disimpan di browser; Tempel / Salin kode / Ganti nama / Hapus.
 - Berkas: `apps/geometri/{library,asset,assetlib}.js`, `apps/katex/{library,asset}.js`.
 
+
+## Demo Live
 Untuk App dapat diakses pada link berikut : 
-[Demo Web]([https://link-url-here.org](https://imaj1n.github.io/Studio-Slide-Animation/#geometri))
+
+👉[Demo Web](https://imaj1n.github.io/Studio-Slide-Animation/#geometri)
