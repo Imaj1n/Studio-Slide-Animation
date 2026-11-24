@@ -37,3 +37,6 @@ Preview memakai HTML export yang sama dengan "Kirim ke Studio Slide", jadi yang 
 - Warna per bagian dalam satu persamaan: `\textcolor{red}{x}+y`, atau `\color{blue} ...` (berlaku sampai akhir grup/sel). Nama: red, blue, green, orange, purple, teal, pink, brown, gray, black, yellow, cyan, gold, lime, navy, maroon, olive, magenta, violet; atau hex `#dc2626` / `#d22`.
 - Tombol "Warnai pilihan" di bawah kanvas membungkus teks yang diblok dengan `\textcolor`.
 - Warna bagian rumus ikut terbawa ke Export HTML dan Studio Slide, dan berubah halus saat transisi antar scene.
+
+## Demo 
+[Klik disini](https://imaj1n.github.io/Studio-Slide-Animation/#katex)
