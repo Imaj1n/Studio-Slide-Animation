@@ -34,11 +34,23 @@ function grp(s,i){
 function sub(g,sz){const cs=[],st={x:0};lay(g,sz,0,st,cs);let y0=1e9,y1=-1e9;
  cs.forEach(c=>c.forEach(q=>{y0=Math.min(y0,q[1]);y1=Math.max(y1,q[1])}));
  if(!cs.length){y0=y1=0}return{cs,w:st.x,y0,y1}}
-const put=(cs,dx,dy,out)=>cs.forEach(c=>out.push(Object.assign(c.map(q=>[q[0]+dx,q[1]+dy]),{g:c.g,gi:c.gi,ci:c.ci})));
+const put=(cs,dx,dy,out)=>cs.forEach(c=>out.push(Object.assign(c.map(q=>[q[0]+dx,q[1]+dy]),{g:c.g,gi:c.gi,ci:c.ci,col:c.col})));
 let AR=2;let GC=0;const tg=(c,g,ci=0)=>Object.assign(c,{g,gi:++GC,ci});
 function scr(s,i){i++;if(s[i]=='{'){let d=1,j=i+1;while(j<s.length&&d){if(s[j]=='{')d++;if(s[j]=='}')d--;j++}return[s.slice(i+1,j-1),j-1]}return[s[i]||'',i]}
 function bbx(out,n0){let a=1e9,b=-1e9,c=1e9,d=-1e9;for(let k=n0;k<out.length;k++)out[k].forEach(q=>{if(q[0]<a)a=q[0];if(q[0]>b)b=q[0];if(q[1]<c)c=q[1];if(q[1]>d)d=q[1]});return a>b?null:[a,b,c,d]}
 const shiftC=(out,n0,dx)=>{if(dx)for(let k=n0;k<out.length;k++)out[k].forEach(q=>{q[0]+=dx})};
+// ---- warna per bagian rumus (\textcolor / \color) ----
+// COLS[idx] = 0 (bawaan) atau rgb24+1 (angka bulat <= 2^24, tepat di Float32)
+const COLS=[0],CN={red:'#dc2626',blue:'#2563eb',green:'#16a34a',orange:'#ea580c',purple:'#9333ea',violet:'#7c3aed',teal:'#0d9488',pink:'#db2777',magenta:'#c026d3',brown:'#92400e',gray:'#6b7280',grey:'#6b7280',black:'#111827',yellow:'#ca8a04',cyan:'#0891b2',gold:'#b45309',lime:'#65a30d',navy:'#1e3a8a',maroon:'#9f1239',olive:'#4d7c0f'};
+function colIdx(name){let h=CN[String(name).trim().toLowerCase()]||String(name).trim();h=h.replace(/^#/,'');
+ if(!/^([0-9a-f]{6}|[0-9a-f]{3})$/i.test(h))return 0;if(h.length==3)h=[...h].map(c=>c+c).join('');
+ const v=parseInt(h,16)+1;let k=COLS.indexOf(v);if(k<0){if(COLS.length>1500)return 0;k=COLS.push(v)-1}return k}
+// ---- panah vektor: kontur tertutup (batang + kepala) ----
+function arrowC(x0,x1,yc,sz,lh,rh){const t=20*sz,hl=Math.min(140*sz,(x1-x0)*.45),hh=110*sz,p=[];
+ if(lh)p.push([x0,yc],[x0+hl,yc-hh],[x0+hl,yc-t]);else p.push([x0,yc-t]);
+ if(rh)p.push([x1-hl,yc-t],[x1-hl,yc-hh],[x1,yc],[x1-hl,yc+hh],[x1-hl,yc+t]);else p.push([x1,yc-t],[x1,yc+t]);
+ if(lh)p.push([x0+hl,yc+t],[x0+hl,yc+hh]);else p.push([x0,yc+t]);
+ return p}
 function lay(s,sz,yo,st,out){
  for(let i=0;i<s.length;i++){const ch=s[i];let bn0=out.length,bx0=st.x,bch=ch,bop=false;
   if(ch=='^'||ch=='_'){
@@ -104,6 +116,16 @@ function lay(s,sz,yo,st,out){
    put(c.cs,st.x+lw+pd,yo,out);
    if(rw)bigDelim(dr,st.x+lw+pd+c.w+pd,yT,yB,sz,out);
    st.x+=lw+pd+c.w+pd+rw}
+  else if(ch=='\uF050'){ // warna: \uF050 + (0xF200+idx) + {isi}
+   const cl=COLS[s.charCodeAt(i+1)-0xF200]|0;let g;[g,i]=grp(s,i+2);i--;const n0=out.length;lay(g,sz,yo,st,out);
+   for(let k=n0;k<out.length;k++)if(!out[k].col)out[k].col=cl}
+  else if(ch>='\uF040'&&ch<='\uF043'){ // \vec \overrightarrow \overleftarrow \overleftrightarrow
+   const ty=ch.charCodeAt(0)-0xF040;let a;[a,i]=grp(s,i+1);i--;
+   const c=sub(a,sz),x0=st.x,lg=ty>0,top=Math.min(c.y0,-440*sz),yc=yo+top-125*sz;
+   const aw=lg?Math.max(c.w,300*sz):Math.min(Math.max(c.w*.85,330*sz),520*sz),W=Math.max(c.w,aw),ax0=x0+(W-aw)/2+(lg?0:40*sz);
+   put(c.cs,x0+(W-c.w)/2,yo,out);
+   out.push(tg(arrowC(ax0,ax0+aw,yc,sz,ty>=2,ty!=2),'\uF040'));
+   st.x+=W}
   else if(G[ch]){const gi=++GC;let ci=0;for(const c of contoursOfGlyph(ch))out.push(Object.assign(c.map(q=>[q[0]*sz+st.x,q[1]*sz+yo]),{g:ch,gi,ci:ci++}));st.x+=G[ch][0]*sz}
   else if(ch=='}')continue;
   {const r=bbx(out,bn0);if(r)st.b={x0:bx0,x1:st.x,ix1:r[1],y0:r[2],y1:r[3],ch:bch,op:bop,n0:bn0}}
@@ -113,25 +135,46 @@ const ENV={matrix:['','','c'],pmatrix:['(',')','c'],bmatrix:['[',']','c'],Bmatri
 const RAW={'(':'(',')':')','[':'[',']':']','|':'|','.':'.','<':'⟨','>':'⟩','/':'|'};
 const CMD={'{':'{','}':'}','|':'‖',langle:'⟨',rangle:'⟩',lbrace:'{',rbrace:'}',vert:'|',lvert:'|',rvert:'|',Vert:'‖',lVert:'‖',rVert:'‖'};
 Object.assign(AL,{cdot:'\uF025',cdots:'\uF021',ldots:'\uF024',dots:'\uF024',vdots:'\uF022',ddots:'\uF023',quad:'  ',qquad:'    '});
+// ---- simbol: \otimes (perkalian tensor), \oplus, \odot (cincin + X / + / titik) ----
+Object.assign(AL,{otimes:'⊗',oplus:'⊕',odot:'⊙'});
+(function(){const cx=389,cy=-250,N=56,R=285,Ri=245,hw=20,TP=Math.PI*2;
+ const P=a=>'M '+a.map(q=>q[0].toFixed(1)+' '+q[1].toFixed(1)).join(' L ')+' Z';
+ const circ=(r,dir)=>{const a=[];for(let k=0;k<N;k++){const t=dir*TP*k/N;a.push([cx+r*Math.cos(t),cy+r*Math.sin(t)])}return a};
+ // simbol silang/plus: ujung lengan jatuh tepat di lingkaran dalam (tidak menimpa cincin -> aman untuk isi evenodd)
+ const arms=base=>{const p=[],al=Math.asin(hw/Ri),d=hw*Math.SQRT2;
+  for(let k=0;k<4;k++){const th=base+k*Math.PI/2;
+   [-al,0,al].forEach(da=>p.push([cx+Ri*Math.cos(th+da),cy+Ri*Math.sin(th+da)]));
+   p.push([cx+d*Math.cos(th+Math.PI/4),cy+d*Math.sin(th+Math.PI/4)])}
+  return p};
+ const ring=P(circ(R,1))+' '+P(circ(Ri,-1));
+ Object.assign(G,{'⊗':[778,ring+' '+P(arms(Math.PI/4))],'⊕':[778,ring+' '+P(arms(0))],'⊙':[778,ring+' '+P(circ(48,1))]})})();
 const delimW=(d,sz)=>sz*({'(':330,')':330,'[':300,']':300,'{':430,'}':430,'|':130,'‖':260,'⟨':380,'⟩':380}[d]||0);
 function pre(t){
- let o='',i=0;const st=[];
+ let o='',i=0,bd=0;const st=[],cs=[];
+ const cc=f=>{while(cs.length&&f(cs[cs.length-1])){o+='}';cs.pop()}};   // tutup wilayah \color yang sudah berakhir
  const rd=()=>{if(t[i]=='\\'){const m=/^\\([A-Za-z]+|[\s\S])/.exec(t.slice(i))||['\\',''];i+=m[0].length;return CMD[m[1]]||'.'}
   const d=t[i++];return RAW[d]||'.'};
  while(i<t.length){const c=t[i];
   if(c=='\\'){
    const m=/^\\([A-Za-z]+|[\s\S])/.exec(t.slice(i))||['\\',''],n=m[1];i+=m[0].length;
-   if(n=='\\')o+='\uF006';
+   if(n=='\\'){cc(e=>e.s==st.length);o+='\uF006'}
    else if(n=='begin'||n=='end'){
     const g=/^\s*\{([^}]*)\}/.exec(t.slice(i)),nm=g?g[1].replace('*',''):'';if(g)i+=g[0].length;
     if(n=='begin'){let k=ENVN.indexOf(nm);if(k<0)k=0;
      o+='\uF005'+String.fromCharCode(0xF100+k)+'{';st.push('e');
      if((nm=='alignat'||nm=='array')&&t[i]=='{'){let d=0;do{if(t[i]=='{')d++;if(t[i]=='}')d--;i++}while(i<t.length&&d)}}
-    else if(st.length&&st[st.length-1]=='e'){o+='}';st.pop()}}
+    else if(st.length&&st[st.length-1]=='e'){cc(e=>e.s>=st.length);o+='}';st.pop()}}
    else if(n=='left'){o+='\uF008'+rd()+'{';st.push('l')}
-   else if(n=='right'){const d=rd();if(st.length&&st[st.length-1]=='l'){o+='}'+d;st.pop()}}
+   else if(n=='right'){const d=rd();if(st.length&&st[st.length-1]=='l'){cc(e=>e.s>=st.length);o+='}'+d;st.pop()}}
    else if(n=='underbrace')o+='\uF003';
    else if(n=='overbrace')o+='\uF004';
+   else if(n=='vec')o+='\uF040';
+   else if(n=='overrightarrow')o+='\uF041';
+   else if(n=='overleftarrow')o+='\uF042';
+   else if(n=='overleftrightarrow')o+='\uF043';
+   else if(n=='textcolor'||n=='color'){
+    const g=/^\s*\{([^}]*)\}/.exec(t.slice(i)),k=g?colIdx(g[1]):0;if(g)i+=g[0].length;
+    if(k){o+='\uF050'+String.fromCharCode(0xF200+k);if(n=='color'){o+='{';cs.push({d:bd,s:st.length})}}}
    else if(n=='{')o+='\uF030';
    else if(n=='}')o+='\uF031';
    else if(n=='|')o+='||';
@@ -144,11 +187,13 @@ function pre(t){
    else if(/^[A-Za-z]+$/.test(n))o+=AL[n]||'';
    else o+=n}
   else{i++;
-   if(c=='&')o+='\uF007';
-   else if(c=='\n'){if(!st.length)o+='\uF006'}
-   else if(c!='\r')o+=c=='-'?'−':c}}
+   if(c=='&'){cc(e=>e.s==st.length);o+='\uF007'}
+   else if(c=='\n'){if(!st.length){cc(e=>e.s==0);o+='\uF006'}}
+   else if(c!='\r'){if(c=='{')bd++;else if(c=='}'){cc(e=>e.d>=bd);bd=Math.max(0,bd-1)}o+=c=='-'?'−':c}}}
+ cc(()=>true);
  while(st.length)o+=st.pop()=='l'?'}.':'}';
  return o}
+
 function splitTop(s,sep){const r=[];let d=0,a=0;for(let i=0;i<s.length;i++){const c=s[i];if(c=='{')d++;else if(c=='}')d--;else if(c==sep&&d==0){r.push(s.slice(a,i));a=i+1}}r.push(s.slice(a));return r}
 function cr(p,seg){const o=[];for(let i=0;i<p.length-1;i++){const a=p[i-1]||p[i],b=p[i],c=p[i+1],d=p[i+2]||c;
  for(let k=0;k<seg;k++){const t=k/seg,t2=t*t,t3=t2*t;
@@ -249,14 +294,14 @@ function build(text,stk){
  let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;
  cs.forEach(c=>c.forEach(q=>{x0=Math.min(x0,q[0]);x1=Math.max(x1,q[0]);y0=Math.min(y0,q[1]);y1=Math.max(y1,q[1])}));
  const s=1/Math.max((x1-x0)/2.4,(y1-y0)/(2.7/AR*.86),1e-6),cx=(x0+x1)/2,cy=(y0+y1)/2;
- const res=cs.map(c=>Object.assign(dft(resample(c.map(q=>[(q[0]-cx)*s,(q[1]-cy)*s]))),{gi:c.gi,ci:c.ci,g:c.g}));
+ const res=cs.map(c=>Object.assign(dft(resample(c.map(q=>[(q[0]-cx)*s,(q[1]-cy)*s]))),{gi:c.gi,ci:c.ci,g:c.g,col:c.col|0}));
  const inst=new Map();res.forEach(r=>{let o=inst.get(r.gi);if(!o)inst.set(r.gi,o={g:r.g,x:0,y:0,n:0});o.x+=r.re[M];o.y+=r.im[M];o.n++});
  const cnt={};[...inst.values()].sort((a,b)=>{const d=a.x/a.n-b.x/b.n;return Math.abs(d)>1e-6?d:a.y/a.n-b.y/b.n}).forEach(o=>{o.key=o.g+'#'+(cnt[o.g]=(cnt[o.g]||0)+1)});
  res.forEach(r=>r.key=inst.get(r.gi).key);
  res.sort((a,b)=>{const d=a.re[M]-b.re[M];return Math.abs(d)>1e-6?d:(a.im[M]-b.im[M])||((a.ci|0)-(b.ci|0))});return res}
 // ---- morphing ----
 const zero=(re0,im0)=>{const d={re:new Float64Array(L),im:new Float64Array(L)};d.re[M]=re0;d.im[M]=im0;return d};
-let cur=[],from=[],to=[],rot=[],gc=[],m=1,phi=0,last=0,tgtN=0;
+let cur=[],from=[],to=[],rot=[],gc=[],m=1,phi=0,last=0,tgtN=0,fcl=[],tcl=[];
 // ---- pencocokan glyph antar scene ----
 // kunci glyph = karakter#kemunculan ke-n (urut dari kiri). Glyph berkunci sama dipindah kaku.
 const gctr=A=>{const mp=new Map();A.forEach(e=>{let o=mp.get(e.key);if(!o)mp.set(e.key,o={x:0,y:0,n:0});o.x+=e.re[M];o.y+=e.im[M];o.n++});mp.forEach(o=>{o.x/=o.n;o.y/=o.n});return mp};
@@ -307,9 +352,11 @@ function create(post){
   AR=msg.AR||AR;
   const T=build(msg.text,!!msg.stk);if(!T)return;
   const R=plan(cur,T,msg.mode||'auto',msg.motion||'trans');
+  const ofc=fcl,otc=tcl;fcl=[];tcl=[];
   from=[];to=[];rot=[];gc=[];
   for(const r of R){
    const a=r.a>=0?cur[r.a]:null,b=r.b>=0?T[r.b]:null,src=b||a;
+   {const pa=r.a>=0?(m>=1?otc[r.a]:(m<.5?ofc[r.a]:otc[r.a]))|0:null,tb=b?b.col|0:null,f0=pa==null?tb:pa;fcl.push(f0);tcl.push(tb==null?f0:tb)}
    const A=a||zero(b.re[M],b.im[M]),B=b||zero(a.re[M],a.im[M]);
    from.push({re:A.re.slice(),im:A.im.slice(),key:src.key,ci:src.ci});to.push(B);
    rot.push(r.rot);gc.push(r.rot?[r.ga,r.gb]:null)}
@@ -324,7 +371,7 @@ function create(post){
   phi+=dt*(msg.sp/100)*TAU;
   const K=Math.max(1,Math.min(M,msg.K|0)),w=weights(K,!!msg.lz),n=cur.length;
   const chainN=msg.ep&&n?(2*K+2)*2:0;
-  const tipOff=n*NP*2,stOff=tipOff+n*2,chOff=stOff+n,total=chOff+chainN;
+  const tipOff=n*NP*2,stOff=tipOff+n*2,chOff=stOff+n,clOff=chOff+chainN,total=clOff+2*n+1;
   let f=msg.buf?new Float32Array(msg.buf):null;
   if(!f||f.length<total)f=new Float32Array(total);
   // cos/sin(k*phi) cukup SEKALI per frame (dulu dihitung ulang untuk tiap kontur)
@@ -352,6 +399,7 @@ function create(post){
      co=pcos[k<0?-k:k],sn=k<0?-psin[-k]:psin[k],
      dx=a*(cr[j]*co-cim[j]*sn),dy=a*(cr[j]*sn+cim[j]*co);
     px+=dx;py+=dy;f[o++]=px;f[o++]=py}}
+  for(let ci=0;ci<n;ci++){f[clOff+ci]=fcl[ci]|0;f[clOff+n+ci]=tcl[ci]|0}f[clOff+2*n]=e;   // warna per kontur: dari, ke, kemajuan transisi
   post({type:'frame',n,NC,NP,K,focus,chainN,anim:m<1,f:f.buffer,total},[f.buffer])}
 
  // data untuk "Export HTML": build + plan semua scene (berat, jadi dilakukan di sini)
@@ -361,7 +409,7 @@ function create(post){
   msg.scenes.forEach((sc,idx)=>{const T=build(sc.t,!!sc.k);if(!T)return;
    const c=T.map(g=>{const a=[],b=[];
     for(let k=-K;k<=K;k++){const w=lz?sinc(k/(K+1)):1;a.push(+(w*g.re[k+M]).toFixed(5));b.push(+(w*g.im[k+M]).toFixed(5))}
-    return [a,b,g.key.slice(0,3)=='ST#'?1:0]});
+    return [a,b,g.key.slice(0,3)=='ST#'?1:0,g.col|0]});
    Ts.push(T);data.push({idx,c})});
   const rd=v=>+v.toFixed(5),tr=[];
   for(let i=1;i<Ts.length;i++)tr.push(plan(Ts[i-1],Ts[i],msg.mode,msg.motion).map(r=>r.rot?[r.a,r.b,r.rot,...r.ga.map(rd),...r.gb.map(rd)]:[r.a,r.b,0]));

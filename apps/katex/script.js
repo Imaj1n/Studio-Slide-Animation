@@ -15,7 +15,7 @@ function onReply(r){
   inflight=false;wAnim=r.anim;
   if(lastF)recycleBuf=lastF.f.buffer;            // frame lama sudah tidak dipakai -> kembalikan ke worker
   const n=r.n,NP=r.NP,f=new Float32Array(r.f),tipOff=n*NP*2,stOff=tipOff+n*2;
-  lastF={n,NP,NC:r.NC,K:r.K,focus:r.focus,chainN:r.chainN,f,tipOff,stOff,chOff:stOff+n};newF=true}
+  lastF={n,NP,NC:r.NC,K:r.K,focus:r.focus,chainN:r.chainN,f,tipOff,stOff,chOff:stOff+n,clOff:stOff+n+r.chainN};newF=true}
  else if(r.type==='export'){const w=waiters.get(r.id);if(w){waiters.delete(r.id);w.ok(r)}}
  else if(r.type==='error'){
   inflight=false;console.error('[core]',r.for,r.message);
@@ -47,10 +47,12 @@ function go(text,stk){
 // ---- UI ----
 ['E=mc^2','\\sum','\\pi','\\int','\\infty','e^{iπ}+1=0','x_n→∞','Fourier'].forEach(t=>{
  const b=document.createElement('button');b.textContent=t.replace(/\\(\w+)/,(m,n)=>AL[n]);b.onclick=()=>{$('tx').value=t;go(t)};$('pre').appendChild(b)});
-[['frac','\\frac{a+b}{c}'],['√','\\sqrt{x^2+1}'],['sin+cos','\\sin x+\\cos x'],['⟨ψ|A†⟩','\\langle ψ|A^\\dagger\\rangle'],['x=y','x=y'],['x−y=0','x-y=0'],['c=a/b','c=\\frac{a}{b}'],['cb=a','cb=a'],['∫ₐᵇ','\\int_a^b f(x)dx'],['∑ batas','\\sum_{a=1}^{\\infty} a^{-2}'],['lim','\\lim_{x\\to 0}\\frac{\\sin x}{x}'],['\\text','\\text{Teks biasa: } x^2=y\\quad\\text{Dan Huruf Kapital}']].forEach(([l,t])=>{
+[['frac','\\frac{a+b}{c}'],['√','\\sqrt{x^2+1}'],['sin+cos','\\sin x+\\cos x'],['⟨ψ|A†⟩','\\langle ψ|A^\\dagger\\rangle'],['x=y','x=y'],['x−y=0','x-y=0'],['c=a/b','c=\\frac{a}{b}'],['cb=a','cb=a'],['∫ₐᵇ','\\int_a^b f(x)dx'],['∑ batas','\\sum_{a=1}^{\\infty} a^{-2}'],['lim','\\lim_{x\\to 0}\\frac{\\sin x}{x}'],['\\text','\\text{Teks biasa: } x^2=y\\quad\\text{Dan Huruf Kapital}'],['F=ma (vektor)','\\vec{F}=m\\vec{a}'],['ψ⊗φ','|\\psi\\rangle\\otimes|\\phi\\rangle'],['warna-warni','\\textcolor{red}{a}^2+\\textcolor{blue}{b}^2=\\textcolor{green}{c}^2']].forEach(([l,t])=>{
  const b=document.createElement('button');b.textContent=l;b.onclick=()=>{$('tx').value=t;go(t)};$('pre').appendChild(b)});
-[['( ) matriks','\\begin{pmatrix}\n a & b \\\\\n c & d\n\\end{pmatrix}'],['[ ] matriks','\\begin{bmatrix}\n a & b \\\\\n c & d\n\\end{bmatrix}'],['align','\\begin{align}\n x &= a+b \\\\\n y &= c\n\\end{align}'],['cases','f(x)=\\begin{cases}\n x & x>0 \\\\\n 0 & x\\leq 0\n\\end{cases}'],['underbrace','\\underbrace{a+b}_{n}'],['overbrace','\\overbrace{a+b}^{n}'],['\\left( \\right)','\\left( \\frac{a}{b} \\right)'],['\\\\ baris baru','\\\\\n']].forEach(([l,t])=>{
+[['( ) matriks','\\begin{pmatrix}\n a & b \\\\\n c & d\n\\end{pmatrix}'],['[ ] matriks','\\begin{bmatrix}\n a & b \\\\\n c & d\n\\end{bmatrix}'],['align','\\begin{align}\n x &= a+b \\\\\n y &= c\n\\end{align}'],['cases','f(x)=\\begin{cases}\n x & x>0 \\\\\n 0 & x\\leq 0\n\\end{cases}'],['underbrace','\\underbrace{a+b}_{n}'],['overbrace','\\overbrace{a+b}^{n}'],['\\left( \\right)','\\left( \\frac{a}{b} \\right)'],['\\\\ baris baru','\\\\\n'],['→ vektor','\\vec{v}'],['→ AB','\\overrightarrow{AB}'],['⊗ tensor','\\otimes'],['⊕','\\oplus'],['warna','\\textcolor{red}{x}']].forEach(([l,t])=>{
  const b=document.createElement('button');b.textContent=l;b.onclick=()=>{const ta=$('tx');ta.setRangeText(t,ta.selectionStart,ta.selectionEnd,'end');ta.focus();ta.dispatchEvent(new Event('input'))};$('sn').appendChild(b)});
+$('tcb').onclick=()=>{const ta=$('tx'),a=ta.selectionStart,b=ta.selectionEnd,sel=ta.value.slice(a,b)||'x';
+ ta.setRangeText('\\textcolor{'+$('tcp').value+'}{'+sel+'}',a,b,'select');ta.focus();ta.dispatchEvent(new Event('input'))};
 let deb;$('tx').oninput=e=>{clearTimeout(deb);deb=setTimeout(()=>go(e.target.value),250)};
 $('K').oninput=e=>$('Kv').textContent=e.target.value;
 let cw=0,dpr=1,restyle=true;
@@ -75,15 +77,27 @@ function draw(){
  const f=F.f,NP=F.NP,n=F.n,focus=F.focus;
  // 1) semua kontur -> dua Path2D (non-coret: evenodd, coret: nonzero); dibangun sekali, dipakai untuk stroke DAN fill
  const fp=new Path2D(),fs=new Path2D();let hasS=false;
+ const CG=new Map(),cE=f[F.clOff+2*n];          // kontur ber-\textcolor dikelompokkan per pasangan warna (dari, ke)
  for(let ci=0;ci<n;ci++){
-  const P=f[F.stOff+ci]?(hasS=true,fs):fp;let o=ci*NP*2;
+  const ca=f[F.clOff+ci],cb=f[F.clOff+n+ci],sk=f[F.stOff+ci];let P;
+  if(ca||cb){const key=ca+'|'+cb;let g=CG.get(key);if(!g)CG.set(key,g={ca,cb,p:new Path2D(),s:new Path2D(),hs:false});
+   if(sk)g.hs=true;P=sk?g.s:g.p}
+  else P=sk?(hasS=true,fs):fp;
+  let o=ci*NP*2;
   P.moveTo(ox+f[o]*sc,oy+f[o+1]*sc);
   for(let s=1;s<NP;s++){o+=2;P.lineTo(ox+f[o]*sc,oy+f[o+1]*sc)}}
  let ink=fp;if(hasS){ink=new Path2D(fp);ink.addPath(fs)}      // satu path untuk garis -> satu panggilan stroke
- ctx.lineJoin='round';ctx.lineWidth=2;ctx.strokeStyle='rgb('+rgb(CL.c.s)+')';
- if(!(Bk>.05))ctx.stroke(ink);
- else if(hasF){ctx.filter='blur('+(Bk*.5*dpr).toFixed(2)+'px)';ctx.lineWidth=2+Bk*.5;ctx.stroke(ink);ctx.filter='none';ctx.lineWidth=2}
- else{ctx.globalAlpha=.16;for(let p=5;p>=1;p--){ctx.lineWidth=2+Bk*p*.45;ctx.stroke(ink)}ctx.globalAlpha=1;ctx.lineWidth=2}
+ const unp=v=>[(v-1)>>16&255,(v-1)>>8&255,(v-1)&255];
+ for(const g of CG.values()){                                  // warna efektif tiap kelompok (campur dari -> ke saat transisi)
+  const rs=v=>v?unp(v):CL.c.s,rf=v=>v?unp(v):CL.c.f;
+  g.sc=g.ca==g.cb?rs(g.ca):mix(rs(g.ca),rs(g.cb),cE);g.fc=g.ca==g.cb?rf(g.ca):mix(rf(g.ca),rf(g.cb),cE);
+  g.ink=g.hs?(()=>{const q=new Path2D(g.p);q.addPath(g.s);return q})():g.p}
+ ctx.lineJoin='round';ctx.lineWidth=2;
+ const strokeInk=(P,col)=>{ctx.strokeStyle='rgb('+rgb(col)+')';
+  if(!(Bk>.05))ctx.stroke(P);
+  else if(hasF){ctx.filter='blur('+(Bk*.5*dpr).toFixed(2)+'px)';ctx.lineWidth=2+Bk*.5;ctx.stroke(P);ctx.filter='none';ctx.lineWidth=2}
+  else{ctx.globalAlpha=.16;for(let p=5;p>=1;p--){ctx.lineWidth=2+Bk*p*.45;ctx.stroke(P)}ctx.globalAlpha=1;ctx.lineWidth=2}};
+ strokeInk(ink,CL.c.s);for(const g of CG.values())strokeInk(g.ink,g.sc);
  // 2) rantai epicycle (kontur fokus): lingkaran & jari-jari masing-masing satu path
  if(F.chainN){
   const ch=F.f,c0=F.chOff,circ=new Path2D(),arm=new Path2D();let any=false;
@@ -98,7 +112,9 @@ function draw(){
  // 4) isi
  if(CL.c.o>.001){ctx.save();ctx.globalCompositeOperation='destination-over';ctx.fillStyle='rgba('+rgb(CL.c.f)+','+CL.c.o+')';
   if(Bk>.05&&hasF)ctx.filter='blur('+(Bk*.5*dpr).toFixed(2)+'px)';
-  ctx.fill(fp,'evenodd');ctx.fill(fs);ctx.restore()}}
+  ctx.fill(fp,'evenodd');ctx.fill(fs);
+  for(const g of CG.values()){ctx.fillStyle='rgba('+rgb(g.fc)+','+CL.c.o+')';ctx.fill(g.p,'evenodd');ctx.fill(g.s)}
+  ctx.restore()}}
 let last=0;
 function frame(t){
  requestAnimationFrame(frame);
@@ -182,7 +198,8 @@ function RT(D){
  const dlin=v=>255*(v<=.0031308?12.92*v:1.055*Math.pow(v,1/2.4)-.055);
  const mix=(a,b,t)=>a.map((v,i)=>dlin(lin(v)+(lin(b[i])-lin(v))*t));
  const rgb=a=>a.map(Math.round).join(',');
- const F=a=>a.map(c=>({re:Float64Array.from(c[0]),im:Float64Array.from(c[1]),k:c[2]}));
+ const unp=v=>[(v-1)>>16&255,(v-1)>>8&255,(v-1)&255],XP=[];
+ const F=a=>a.map(c=>({re:Float64Array.from(c[0]),im:Float64Array.from(c[1]),k:c[2],cl:c[3]|0,c0:c[3]|0,c1:c[3]|0}));
  const zero=(r,i)=>{const d={re:new Float64Array(L),im:new Float64Array(L)};d.re[M]=r;d.im[M]=i;return d};
  let idx=0,cur=F(S[0].c),from=[],to=[],rot=[],gc=[],m=1,tgtN=cur.length,need=true,last=0;
  let col={s:hx(S[0].s),f:hx(S[0].f),o:S[0].o,b:S[0].b||0},ca,cb,cm=1;
@@ -207,9 +224,10 @@ function go(i){
   for(const r of R){
    const a=r[0]>=0?cur[r[0]]:null,b=r[1]>=0?T[r[1]]:null;
    const A=a||zero(b.re[M],b.im[M]),B=b||zero(a.re[M],a.im[M]);
-   from.push({re:A.re.slice(),im:A.im.slice(),k:(b||a).k});to.push(B);
+   const pa=a?(m>=1?a.c1:(m<.5?a.c0:a.c1)):null,tb=b?b.cl:null,f0=pa==null?tb:pa;
+   from.push({re:A.re.slice(),im:A.im.slice(),k:(b||a).k,c0:f0,c1:tb==null?f0:tb});to.push(B);
    rot.push(r[2]||0);gc.push(r[2]?[[r[3],r[4]],[r[5],r[6]]]:null)}
-  cur=from.map(f=>({re:f.re.slice(),im:f.im.slice(),k:f.k}));tgtN=T.length;m=0;
+  cur=from.map(f=>({re:f.re.slice(),im:f.im.slice(),k:f.k,c0:f.c0,c1:f.c1}));tgtN=T.length;m=0;
   ca={s:[...col.s],f:[...col.f],o:col.o,b:col.b};cb={s:hx(S[i].s),f:hx(S[i].f),o:S[i].o,b:S[i].b||0};cm=0;ui()}
  function frame(t){
   const dt=Math.min((t-last)/1000,.05);last=t;
@@ -219,18 +237,28 @@ function go(i){
   if(run){blend(cur,from,to,rot,gc,e);if(m>=1)cur.length=tgtN}
   if(cm<1){cm=Math.min(1,cm+dt/CD);const u=cm*cm*(3-2*cm);
    col={s:mix(ca.s,cb.s,u),f:mix(ca.f,cb.f,u),o:ca.o+(cb.o-ca.o)*u,b:ca.b+(cb.b-ca.b)*u}}
-  let d='',d2='';
+  let d='',d2='';const gr=new Map();
   for(const c of cur){let t='';
    for(let s=0;s<=NC;s++){let x=0,y=0;
     for(let k=-K;k<=K;k++){const j=k+M,q=CS[ix(k,s%NC)];
      x+=c.re[j]*q[0]-c.im[j]*q[1];y+=c.re[j]*q[1]+c.im[j]*q[0]}
     t+=(s?'L':'M')+x.toFixed(4)+' '+y.toFixed(4)}
-   t+='Z';if(c.k)d2+=t;else d+=t}
+   t+='Z';
+   if(c.c0||c.c1){const key=c.c0+'|'+c.c1;let g=gr.get(key);if(!g)gr.set(key,g={a:c.c0,b:c.c1,d:'',d2:''});if(c.k)g.d2+=t;else g.d+=t}
+   else if(c.k)d2+=t;else d+=t}
   const sg=col.b*.5/318;
-  [[P,d],[P2,d2]].forEach(a=>{const p=a[0];p.setAttribute('d',a[1]);p.setAttribute('stroke','rgb('+rgb(col.s)+')');
-   p.setAttribute('fill','rgb('+rgb(col.f)+')');p.setAttribute('fill-opacity',col.o);
+  const ap=(p,dd,sc,fc)=>{p.setAttribute('d',dd);p.setAttribute('stroke','rgb('+rgb(sc)+')');
+   p.setAttribute('fill','rgb('+rgb(fc)+')');p.setAttribute('fill-opacity',col.o);
    p.setAttribute('stroke-width',(.006+sg).toFixed(5));
-   if(sg>.0004)p.setAttribute('filter','url(#bf)');else p.removeAttribute('filter')});
+   if(sg>.0004)p.setAttribute('filter','url(#bf)');else p.removeAttribute('filter')};
+  ap(P,d,col.s,col.f);ap(P2,d2,col.s,col.f);
+  let q=0;                                              // kelompok warna per bagian rumus: pasangan path tambahan
+  for(const g of gr.values()){
+   for(let z=0;z<2;z++)if(!XP[q*2+z]){const p=P.cloneNode(false);p.removeAttribute('id');   // cloneNode: tersedia juga di Studio Slide (document tiruan tanpa createElementNS)
+    p.setAttribute('fill-rule',z?'nonzero':'evenodd');P.parentNode.appendChild(p);XP[q*2+z]=p}
+   const rs=v=>v?unp(v):col.s,rf=v=>v?unp(v):col.f,sc=g.a==g.b?rs(g.a):mix(rs(g.a),rs(g.b),e),fc=g.a==g.b?rf(g.a):mix(rf(g.a),rf(g.b),e);
+   ap(XP[q*2],g.d,sc,fc);ap(XP[q*2+1],g.d2,sc,fc);q++}
+  for(let z=q*2;z<XP.length;z++)XP[z].setAttribute('d','');
   if(sg>.0004)GB.setAttribute('stdDeviation',sg.toFixed(5));
   need=false;requestAnimationFrame(frame)}
  $('pv').onclick=()=>go(idx-1);$('nx').onclick=()=>go(idx+1);

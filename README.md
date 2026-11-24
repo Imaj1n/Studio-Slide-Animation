@@ -29,4 +29,11 @@ Preview memakai HTML export yang sama dengan "Kirim ke Studio Slide", jadi yang 
 - **Aset**: Geometri = objek terpilih di kanvas; KaTeX = scene yang dicentang. Salin dengan Ctrl+C, tempel dengan Ctrl+V di proyek mana pun (kodenya berupa teks, bisa dikirim ke teman).
 - **Pustaka aset**: aset bernama yang disimpan di browser; Tempel / Salin kode / Ganti nama / Hapus.
 - Berkas: `apps/geometri/{library,asset,assetlib}.js`, `apps/katex/{library,asset}.js`.
-# Studio-Slide-Animation
+
+## Sintaks tambahan di Editor KaTeX
+
+- Vektor: `\vec{a}` (panah pendek), `\overrightarrow{AB}`, `\overleftarrow{AB}`, `\overleftrightarrow{AB}`
+- Simbol: `\otimes` (perkalian tensor), `\oplus`, `\odot`
+- Warna per bagian dalam satu persamaan: `\textcolor{red}{x}+y`, atau `\color{blue} ...` (berlaku sampai akhir grup/sel). Nama: red, blue, green, orange, purple, teal, pink, brown, gray, black, yellow, cyan, gold, lime, navy, maroon, olive, magenta, violet; atau hex `#dc2626` / `#d22`.
+- Tombol "Warnai pilihan" di bawah kanvas membungkus teks yang diblok dengan `\textcolor`.
+- Warna bagian rumus ikut terbawa ke Export HTML dan Studio Slide, dan berubah halus saat transisi antar scene.
